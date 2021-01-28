@@ -1,73 +1,58 @@
 package DFS_BFS;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 
 public class Itinerary {
-	public static boolean allVisited(boolean[] visited) {
-		for (boolean b : visited) {
-			if (!b) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public static void dfs(int i, String[][] tickets, ArrayList<String> output, boolean[] visited) {
-		visited[i] = true;
+	ArrayList<String> list = new ArrayList<>();
+	String posAnswer = "";
+	boolean[] visited;
+	public void dfs(String[][] tickets, String dest, int count) {
+		posAnswer += dest + " ";
 		
-		if(allVisited(visited)) {
+		if(count == tickets.length) {
+			if(posAnswer.split(" ").length == tickets.length + 1)
+				list.add(posAnswer);
+			System.out.println(posAnswer);
 			return;
 		}
-
-		String word = output.get(output.size() - 1);
-		int index = tickets.length;
-		for (int j = 0; j < tickets.length; j++) {
-			if (!visited[j] && tickets[j][0].equals(word) ) {
-				if(index == tickets.length) {
-					index = j;
-				} else {
-					if (tickets[index][1].compareTo(tickets[j][1]) > 0) {
-						index = j;
-					}
-					
-				}
+		
+		for(int i = 0 ; i < tickets.length; i++) {
+			String from = tickets[i][0];
+			String to = tickets[i][1];
+			if(dest.equals(from) && !visited[i]) {
+				visited[i] = true;
+				dfs(tickets, to, count  + 1);
+				visited[i] = false;
+				posAnswer = posAnswer.substring(0, posAnswer.length() - 4);
+				
 			}
 		}
-		output.add(tickets[index][1]);
-		dfs(index, tickets, output, visited);
 	}
 
-	public static String[] solution(String[][] tickets) {
-		String[] answer = {};
-		int index = tickets.length;
-		ArrayList<String> output = new ArrayList<>();
-		output.add("ICN");
-		boolean[] visited = new boolean[tickets.length];
-		for (int i = 0; i < tickets.length; i++) {
-			if (tickets[i][0].equals("ICN")) {
-				if(index == tickets.length) {
-					index = i;
-				} else {
-					if (tickets[index][1].compareTo(tickets[i][1]) > 0) {
-						index = i;
-					}
-				}
+	public String[] solution(String[][] tickets) {
+		for(int i = 0 ; i < tickets.length; i++) {
+			visited = new boolean[tickets.length];
+			String from = tickets[i][0];
+			String to = tickets[i][1];
+			if(from.equals("ICN")) {
+				visited[i] = true;
+				posAnswer = "ICN ";
+				dfs(tickets, to, 1);
 			}
 		}
-		output.add(tickets[index][1]);
-		dfs(index, tickets, output, visited);
-		answer = new String[output.size()];
-		for(int i = 0 ; i < output.size(); i++) {
-			answer[i] = output.get(i);
-		}
-		return answer;
+		Collections.sort(list);
+		return list.get(0).split(" ");
 	}
 
 	public static void main(String[] args) {
+		Itinerary i = new Itinerary();
+		
 		String[][] tickets = { { "ICN", "SFO" }, { "ICN", "ATL" }, { "SFO", "ATL" }, {"ATL", "ICN"}, {"ATL", "SFO"} };
 
-		String[] output = solution(tickets);
+		String[] output = i.solution(tickets);
 
 		for (String s : output) {
 			System.out.println(s);
